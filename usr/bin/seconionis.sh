@@ -8,7 +8,7 @@ VERSION="Seconionis 1.2"
 
 TOR_EXCLUDE="192.168.0.0/16 172.16.0.0/12 10.0.0.0/8"
 
-TOR_UID="tor"
+TOR_UID="debian-tor"
 
 TOR_PORT="9040"
 
@@ -130,8 +130,9 @@ wipe() {
 }
 
 get_ip() {
-    RADDR=$(curl -s https://ipinfo.io/ip)
-    msg "[>]Your remote ip addres: $RADDR"
+    TML=$(curl -s https://check.torproject.org/?lang=en_US)
+	IP=$(echo "$HTML" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -n 1)
+    echo "Public IP         : $IP"
 }
 
 backup_torrc() {
