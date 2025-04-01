@@ -131,7 +131,7 @@ wipe() {
 
 get_ip() {
     TML=$(curl -s https://check.torproject.org/?lang=en_US)
-	IP=$(echo "$HTML" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -n 1)
+    IP=$(echo "$HTML" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -n 1)
     echo "Public IP         : $IP"
 }
 
