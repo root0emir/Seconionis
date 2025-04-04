@@ -132,31 +132,32 @@ wipe() {
 get_ip() {
     HTML=$(curl -s https://check.torproject.org/?lang=en_US)
     IP=$(echo "$HTML" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -n 1)
-    echo "Public IP  : $IP"
+    echo "Public IP         : $IP"
 }
+
 
 backup_torrc() {
     warn "Backing up tor config..."
     mv "$TORRC" $BACKUPDIR/torrc.bak
-    msg "[+]Backed up tor config"
+    msg "Backed up tor config"
 }
 
 backup_resolv_conf() {
     info "Backing up nameservers..."
     mv /etc/resolv.conf $BACKUPDIR/resolv.conf.bak
-    msg "[+]Backed up nameservers"
+    msg "Backed up nameservers"
 }
 
 backup_iptables() {
     info "Backing up iptables rules..."
     iptables-save >$BACKUPDIR/iptables.rules.bak
-    msg "[+]Backed up iptables rules"
+    msg "Backed up iptables rules"
 }
 
 backup_sysctl() {
     info "Backing up sysctl rules..."
     sysctl -a >$BACKUPDIR/sysctl.conf.bak
-    msg "[+]Backed up sysctl rules"
+    msg "Backed up sysctl rules"
 }
 
 restore_torrc() {
@@ -164,7 +165,7 @@ restore_torrc() {
         warn "Restoring tor config..."
         rm -f /etc/tor/torrc
         mv $BACKUPDIR/torrc.bak /etc/tor/torrc
-        msg "[+]Restored tor config"
+        msg "Restored tor config"
     fi
 }
 
@@ -173,7 +174,7 @@ restore_resolv_conf() {
         warn "Restoring nameservers..."
         rm -f $BACKUPDIR/resolv.conf
         mv $BACKUPDIR/resolv.conf.bak /etc/resolv.conf
-        msg "[+]Restored nameservers"
+        msg "Restored nameservers"
     fi
 }
 
@@ -191,7 +192,7 @@ restore_sysctl() {
         warn "[!]Restoring sysctl rules"
         sysctl -p $BACKUPDIR/sysctl.conf.bak &>"/dev/null"
         rm -f $BACKUPDIR/sysctl.conf.bak
-        msg "[+]Restored sysctl rules"
+        msg "Restored sysctl rules"
     fi
 }
 
@@ -208,7 +209,7 @@ nameserver 8.8.8.8
 nameserver 8.8.4.4
 EOF
     chmod 644 /etc/resolv.conf
-    msg "[+]Configured nameservers"
+    msg "Configured nameservers"
 }
 
 gen_torrc() {
@@ -238,7 +239,7 @@ UseEntryGuards 1
 EnforceDistinctSubnets 1
 EOF
     chmod 644 ${TORRC}
-    msg "[🗸]Configured tor"
+    msg "Configured tor"
 }
 
 apply_iptables_rules() {
@@ -267,7 +268,7 @@ apply_iptables_rules() {
     iptables -A OUTPUT -m owner --uid-owner $TOR_UID -j ACCEPT
     iptables -A OUTPUT -j REJECT
 
-    msg "[+]Applied iptables rules"
+    msg "Applied iptables rules"
 }
 
 apply_sysctl_rules() {
@@ -385,12 +386,12 @@ apply_sysctl_rules() {
     sysctl -w net.ipv6.conf.all.disable_ipv6=1 &>"/dev/null"
     sysctl -w net.ipv6.conf.default.disable_ipv6=1 &>"/dev/null"
 
-    msg "[+]Applied sysctl rules"
+    msg "Applied sysctl rules"
 }
 
 start() {
     if is_started; then
-        err "[!]Seconionis is already started"
+        err "Seconionis is already started"
     fi
 
     backup_torrc
@@ -420,7 +421,7 @@ start() {
 
 stop() {
     if ! is_started; then
-        err "[!]Seconionis is already stopped"
+        err "Seconionis is already stopped"
     fi
 
     restore_sysctl
@@ -440,18 +441,18 @@ stop() {
 
 changeid() {
     if ! is_started; then
-        err "[!]Seconionis stopped"
+        err "Seconionis stopped"
     fi
 
     info "[>]Changing tor identity..."
     stop_service tor &>"/dev/null"
     sleep 1
     start_service tor &>"/dev/null"
-    msg "[+]Tor identity changed"
+    msg "Tor identity changed"
 }
 
 changemac() {
-    warn "[>]Changing mac addresses..."
+    warn "Changing mac addresses..."
     IFACES=$(ip -o link show | awk -F': ' '{print $2}')
     for IFACE in $IFACES; do
         if [ $IFACE != "lo" ]; then
@@ -460,10 +461,10 @@ changemac() {
             ip link set $IFACE up &>"/dev/null"
         fi
     done
-    msg "[+]Changed mac addresses"
+    msg "Changed mac addresses"
 }
 
-revertvmac() {
+revertmac() {
     warn "[>]Reverting mac addresses..."
     IFACES=$(ip -o link show | awk -F': ' '{print $2}')
     for IFACE in $IFACES; do
@@ -484,40 +485,40 @@ status() {
     AUTOSTARTSTATUS=$(systemctl is-enabled seconionis-autostart)
 
     if is_started; then
-        msg "[+]Seconionis started"
+        msg "Seconionis started"
     else
-        warn "[!]Seconionis stopped"
+        warn "Seconionis stopped"
     fi
 
     if [[ "${TORSTATUS}" == "active" ]]; then
-        msg "[+]Tor service is: ${TORSTATUS}"
+        msg "Tor service is: ${TORSTATUS}"
     else
-        warn "[!]Tor service is: ${TORSTATUS}"
+        warn "Tor service is: ${TORSTATUS}"
     fi
 
     if [[ "${AUTOWIPESTATUS}" == "enabled" ]]; then
-        msg "[+]seconionis-autowipe service is: ${AUTOWIPESTATUS}"
+        msg "seconionis-autowipe service is: ${AUTOWIPESTATUS}"
     else
-        warn "[!]seconionis-autowipe service is: ${AUTOWIPESTATUS}"
+        warn "seconionis-autowipe service is: ${AUTOWIPESTATUS}"
     fi
 
     if [[ "${AUTOSTARTSTATUS}" == "enabled" ]]; then
-        msg "[+]seconionis-autostart service is: ${AUTOSTARTSTATUS}"
+        msg "seconionis-autostart service is: ${AUTOSTARTSTATUS}"
     else
-        warn "[!]seconionis-autostart service is: ${AUTOSTARTSTATUS}"
+        warn "seconionis-autostart service is: ${AUTOSTARTSTATUS}"
     fi
 }
 
 autowipe() {
     warn "Enabling seconionis-autowipe..."
     systemctl enable seconionis-autowipe &>"/dev/null"
-    msg "[+]Enabled Seconionis-autowipe"
+    msg "Enabled Seconionis-autowipe"
 }
 
 autostart() {
     warn "Enabling seconionis-autostart..."
     systemctl enable seconionis-autostart &>"/dev/null"
-    msg "[+]Enabled seconionis-autostart"
+    msg "Enabled seconionis-autostart"
 }
 
 usage() {
@@ -579,17 +580,17 @@ main() {
     changeid)
         check_root
         check_backup_dir
-        chngid
+        changeid
         ;;
     changemac)
         check_root
         check_backup_dir
-        chngmac
+        changemac
         ;;
     revertmac)
         check_root
         check_backup_dir
-        rvmac
+        revertmac
         ;;
     version)
         version
