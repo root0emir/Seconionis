@@ -10,7 +10,7 @@ from PyQt5.QtCore import Qt
 
 # Developer root0emir 
 # Securonis Linux Tor Traffic Router GUI Menu 
-# Seconionis Version 1.3
+# Seconionis Version 1.4
 
 class SeconionisGUI(QMainWindow):
     def __init__(self):
@@ -53,8 +53,8 @@ class SeconionisGUI(QMainWindow):
         title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #2ECC71; margin: 0;")
         
 
-        if os.path.exists("/usr/share/icons/securonis/seconionis.png"):
-            pixmap = QPixmap("/usr/share/icons/securonis/seconionis.png")
+        if os.path.exists("seconionis.png"):
+            pixmap = QPixmap("seconionis.png")
             logo_label.setPixmap(pixmap.scaled(50, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation))  
         else:
             logo_label.setText("!")
@@ -93,25 +93,30 @@ class SeconionisGUI(QMainWindow):
             ("Tor Status", "status"),
             ("Restart Tor", "restart"),
             ("Set Autowipe", "autowipe"),
+            ("Disable Autowipe", "disable-autowipe"),
             ("Set Autostart", "autostart"),
+            ("Disable Autostart", "disable-autostart"),
             ("Get IP", "ip"),
             ("Change Tor ID", "changeid"),
             ("Change MAC", "changemac"),
             ("Reset MAC", "revertmac"),
-            ("Info", "version"),
+            ("Version", "version"),
+            ("About", "about"),
             ("Exit", "exit")
         ]
         
         for i, (text, cmd) in enumerate(buttons):
-            row, col = divmod(i, 3)
             button = QPushButton(text)
             button.setFixedHeight(45) 
             
             if cmd == "exit":
                 button.clicked.connect(self.close)
+            elif cmd == "about":
+                button.clicked.connect(self.show_about)
             else:
                 button.clicked.connect(lambda checked=False, c=cmd: self.run_command(c))
             
+            row, col = divmod(i, 3)
             grid_layout.addWidget(button, row, col)
         
         return grid_layout
@@ -208,6 +213,15 @@ class SeconionisGUI(QMainWindow):
         except Exception as e:
             self.show_message("Error", f"System error:\n{str(e)}", QMessageBox.Critical)
     
+    def show_about(self):
+        """Display about information"""
+        about_text = """Seconionis is a tool that forces all system traffic through the Tor network by using a Tor transparent proxy.
+
+Author: root0emir
+Github: https://github.com/Securonis/Seconionis"""
+        
+        self.show_message("About Seconionis", about_text, QMessageBox.Information)
+    
     def show_message(self, title, message, icon):
         """Display a styled message box"""
         msg_box = QMessageBox(self)
@@ -252,4 +266,3 @@ def main():
 
 if __name__ == "__main__":
     main() 
-┌─[user@par
