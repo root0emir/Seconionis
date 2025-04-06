@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Seconionis Old CLI Menu 1.2
+
 cat << "EOF"
 
               ##    
